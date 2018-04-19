@@ -1,3 +1,9 @@
+# Why
+
+I need to extract frames from videos in order to feed into dnn pipeline.
+
+this is the answer package.
+
 # Install
 
 ```
