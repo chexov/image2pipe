@@ -1,7 +1,12 @@
+# Install
+
 ```
 pip install image2pipe
 ```
 
+# Usage
+
+```
 from multiprocessing import Queue
 import logging
 import cv2
@@ -20,4 +25,5 @@ for i in range(30):
     cv2.imshow("frame %d" % i, img)
     cv2.waitKey()
     cv2.destroyAllWindows()
+```
 
