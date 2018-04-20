@@ -6,13 +6,13 @@ import logging
 import multiprocessing
 import subprocess
 import sys
+from time import time
 
 import numpy
 import websocket
 
 from . import ffmpeg
 from . import utils
-from time import time
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
@@ -102,7 +102,7 @@ def _emitt_image_output(_proc, _emitter, _scale):
             if len(bb) > 0:
                 try:
                     ndarr = numpy.frombuffer(bb, dtype=numpy.uint8).reshape((_scale[1], _scale[0], 3))
-                    fn = frame_counter.next()
+                    fn = next(frame_counter)
                     _emitter.onNext((fn, ndarr))
                 except Exception as err:
                     log.error("%s" % err)
@@ -166,7 +166,7 @@ class StitchVideoProcess(multiprocessing.Process):
     def run(self):
         try:
             scale_str = "x".join(map(lambda x: str(x), self.scale))
-            cmd = ["ffmpeg", '-v', 'error', '-y', '-f', 'rawvideo',
+            cmd = ["ffmpeg", '-y', '-f', 'rawvideo',
                    '-vcodec', 'rawvideo', '-s', scale_str, '-pix_fmt', 'bgr24', '-r', str(self.fps),
                    '-i', '-', '-an',
                    '-pix_fmt', 'yuv420p', '-vcodec', 'libx264', '-profile:v', 'baseline', '-crf', '21', '-g',
@@ -174,12 +174,12 @@ class StitchVideoProcess(multiprocessing.Process):
                    '-b:v', '2400k',
                    '-f', self.container, self.out_url]
 
-            log.debug("popen %s" % " ".join(cmd))
+            log.debug("popen '%s'" % " ".join(cmd))
             ffmpeg_proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, bufsize=3 * self.scale[0] * self.scale[1])
 
             frames_stack = collections.deque()
             frames_counter = itertools.count()
-            next_fn = frames_counter.next()
+            next_fn = next(frames_counter)
 
             start_time = time()
             frames_processed = 0
@@ -201,16 +201,18 @@ class StitchVideoProcess(multiprocessing.Process):
                     # log.debug("draining stack... next_frame=%s stack size=%s" % (next_fn, len(frames_stack)))
                     while len(frames_stack) > 0:
                         p = frames_stack.popleft()
-                        if p[0] == next_fn:
+                        fn = p[0]
+                        img = p[1]
+                        if fn == next_fn:
                             try:
-                                p[1].tofile(ffmpeg_proc.stdin)
+                                ffmpeg_proc.stdin.write(img)
                             except Exception:
                                 log.error("rtmpt ffmpeg failed? exiting", exc_info=True)
                                 # self.frames_q.close()
                                 self.terminate()
                                 return
 
-                            next_fn = frames_counter.next()
+                            next_fn = next(frames_counter)
                         else:
                             frames_stack.appendleft(p)
                             break
@@ -219,7 +221,6 @@ class StitchVideoProcess(multiprocessing.Process):
                             print('******** stitch fps = %.02f **********' % (frames_processed / (time() - start_time)))
                             start_time = time()
                             frames_processed = 0
-
 
             log.info("done with stitching!")
             # self.frames_q.close()

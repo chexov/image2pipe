@@ -1,10 +1,14 @@
+import logging
+from multiprocessing import Queue
 from unittest import TestCase
 
-import image2pipe
-from multiprocessing import Queue
-
-import logging
 import cv2
+
+import image2pipe
+
+SCALE = scale = (320, 160)
+
+VIDEO_URL = "/Users/chexov/testvideo/shuttle-flip.mp4"
 
 logging.basicConfig()
 
@@ -12,7 +16,7 @@ logging.basicConfig()
 class Image2PipeTest(TestCase):
     def test_rgb24_from_url(self):
         q = Queue()
-        decoder = image2pipe.images_from_url(q, "/Users/chexov/testvideo/shuttle-flip.mp4", fps="30", scale=(1000, 556))
+        decoder = image2pipe.images_from_url(q, VIDEO_URL, fps="30", scale=SCALE)
         decoder.start()
 
         for i in range(30):
@@ -21,5 +25,23 @@ class Image2PipeTest(TestCase):
             cv2.waitKey()
             cv2.destroyAllWindows()
 
-Image2PipeTest().test_rgb24_from_url()
+    def test_stitch(self):
+        fps = "30"
+        out_url = "out.ts"
+        scale = (1000, 552)
 
+        bgr_q = Queue()
+
+        decoder = image2pipe.images_from_url(bgr_q, VIDEO_URL, fps="30", scale=(1000, 552))
+        decoder.start()
+
+        FORMAT_MPEGTS = "mpegts"
+        rtmpt = image2pipe.StitchVideoProcess(bgr_q, out_url, fps, scale, FORMAT_MPEGTS)
+        rtmpt.start()
+
+        rtmpt.join()
+
+
+if __name__ == '__main__':
+    Image2PipeTest().test_rgb24_from_url()
+    Image2PipeTest().test_stitch()
