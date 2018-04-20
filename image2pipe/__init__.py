@@ -166,7 +166,7 @@ class StitchVideoProcess(multiprocessing.Process):
     def run(self):
         try:
             scale_str = "x".join(map(lambda x: str(x), self.scale))
-            cmd = ["ffmpeg", '-y', '-f', 'rawvideo',
+            cmd = ["ffmpeg", '-v', 'error', '-y', '-f', 'rawvideo',
                    '-vcodec', 'rawvideo', '-s', scale_str, '-pix_fmt', 'bgr24', '-r', str(self.fps),
                    '-i', '-', '-an',
                    '-pix_fmt', 'yuv420p', '-vcodec', 'libx264', '-profile:v', 'baseline', '-crf', '21', '-g',
