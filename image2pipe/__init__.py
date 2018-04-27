@@ -121,7 +121,7 @@ def _emitt_image_output(_proc, _emitter, _scale):
         _emitter.onError(sys.exc_info()[1])
 
 
-def images_from_url(q, video_url, ss="00:00:00", fps=None, scale=(224, 224), pix_fmt="bgr24"):
+def images_from_url(q, video_url, ss="00:00:00", fps=None, scale=(224, 224), pix_fmt="bgr24", vf: list = []):
     """
 
     :param ss: start second in a format of time "00:00:00"
@@ -134,7 +134,7 @@ def images_from_url(q, video_url, ss="00:00:00", fps=None, scale=(224, 224), pix
     :type q: queues.Queue
     """
 
-    ffmpeg_p = ffmpeg.images_from_url_subp(fps, scale, video_url, ss, image_format=pix_fmt)
+    ffmpeg_p = ffmpeg.images_from_url_subp(fps, scale, video_url, ss, image_format=pix_fmt, vf=vf)
     reader_p = multiprocessing.Process(target=lambda: ffmpeg.enqueue_frames_from_output(ffmpeg_p, q, scale))
     reader_p.daemon = True
     return reader_p

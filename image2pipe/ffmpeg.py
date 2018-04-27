@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import copy
 import itertools
 import logging
 import multiprocessing
@@ -31,12 +32,13 @@ def bgr24_from_stdin_subp(_fps, _scale):
     return ffmpeg_p
 
 
-def images_from_url_subp(_fps, _scale, _url, ss=None, image_format='bgr24'):
+def images_from_url_subp(_fps, _scale, _url, ss=None, image_format='bgr24', vf: list = []):
     """
     Usage:
     p = images_from_url_subp(fps, scale, url)
     :type ss: str
 
+    :param vf: ffmpeg -vf filters 
     :param image_format: str with ffmpeg's pix_fmt
     :param ss: "00:00:00"
     :param _fps: 
@@ -50,14 +52,14 @@ def images_from_url_subp(_fps, _scale, _url, ss=None, image_format='bgr24'):
         cmd.append(ss)
     cmd += ["-i", _url, '-an', '-sn', "-f", "image2pipe", "-vcodec", "rawvideo", "-pix_fmt", image_format]
 
-    vf = []
+    _vf = copy.copy(vf)
     if _fps:
-        vf.append("fps=%s" % _fps)
+        _vf.append("fps=%s" % _fps)
     if _scale:
-        vf.append("scale=%sx%s" % (_scale[0], _scale[1]))
-    if len(vf) > 0:
+        _vf.append("scale=%sx%s" % (_scale[0], _scale[1]))
+    if len(_vf) > 0:
         cmd.append("-vf")
-        cmd.append(",".join(vf))
+        cmd.append(",".join(_vf))
     cmd.append("-")
     log.debug("popen %s" % " ".join(cmd))
     return subprocess.Popen(cmd, stdout=subprocess.PIPE, bufsize=10 ** 8)

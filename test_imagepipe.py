@@ -25,6 +25,17 @@ class Image2PipeTest(TestCase):
             cv2.waitKey()
             cv2.destroyAllWindows()
 
+    def test_vf(self):
+        q = Queue()
+        # decoder = image2pipe.images_from_url(q, VIDEO_URL, fps="30", scale=SCALE, vf=["cropdetect=24:16:0"])
+        decoder = image2pipe.images_from_url(q, VIDEO_URL, fps="30", scale=SCALE, vf=["crop=224:224:0:36"])
+        decoder.start()
+
+        fn, img = q.get()
+        cv2.imshow("frame %d" % 0, img)
+        cv2.waitKey()
+        cv2.destroyAllWindows()
+
     def test_stitch(self):
         fps = "30"
         out_url = "out.ts"
@@ -43,5 +54,6 @@ class Image2PipeTest(TestCase):
 
 
 if __name__ == '__main__':
+    Image2PipeTest().test_vf()
     Image2PipeTest().test_rgb24_from_url()
     Image2PipeTest().test_stitch()
