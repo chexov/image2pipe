@@ -1,8 +1,8 @@
 # Why
 
-I need to extract frames from videos in order to feed into dnn pipeline.
+I need to extract decoded frames from videos in order to feed DNN pipeline.
 
-this is the answer package.
+This is the answer package.
 
 # Install
 
