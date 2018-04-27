@@ -6,6 +6,7 @@ import logging
 import multiprocessing
 import subprocess
 import sys
+from multiprocessing import Queue
 from time import time
 
 import numpy
@@ -151,7 +152,8 @@ def ffprobe(url):
 
 
 class StitchVideoProcess(multiprocessing.Process):
-    def __init__(self, frames_q, out_url, fps, scale, muxer='flv'):
+    def __init__(self, frames_q: Queue, out_url: str, fps: str, scale: tuple, pix_fmt: str = "bgr24",
+                 muxer: str = 'flv'):
         """
 
         :type frames_q: queues.Queue
@@ -162,12 +164,13 @@ class StitchVideoProcess(multiprocessing.Process):
         self.out_url = out_url
         self.q = frames_q
         self.container = muxer
+        self.pix_fmt = pix_fmt
 
     def run(self):
         try:
             scale_str = "x".join(map(lambda x: str(x), self.scale))
             cmd = ["ffmpeg", '-v', 'error', '-y', '-f', 'rawvideo',
-                   '-vcodec', 'rawvideo', '-s', scale_str, '-pix_fmt', 'bgr24', '-r', str(self.fps),
+                   '-vcodec', 'rawvideo', '-s', scale_str, '-pix_fmt', self.pix_fmt, '-r', str(self.fps),
                    '-i', '-', '-an',
                    '-pix_fmt', 'yuv420p', '-vcodec', 'libx264', '-profile:v', 'baseline', '-crf', '21', '-g',
                    str(self.fps),
