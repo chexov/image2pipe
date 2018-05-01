@@ -1,5 +1,5 @@
 gevent==1.2.2
 greenlet==0.4.13
-numpy==1.14.2
 opencv-python==3.4.0.12
 websocket==0.2.1
+numpy
