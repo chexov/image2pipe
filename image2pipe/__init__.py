@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+# encode: utf-8
+
 import collections
 import itertools
 import json
@@ -147,7 +149,7 @@ def ffprobe(url):
     if p.poll() != 0:
         raise RuntimeError("ffprobe exit code is %s" % p.poll())
 
-    ffp = json.loads(p.stdout.read())
+    ffp = json.loads(p.stdout.read().decode("utf-8"))
     return ffp
 
 
