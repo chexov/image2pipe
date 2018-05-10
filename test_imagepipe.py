@@ -14,6 +14,17 @@ logging.basicConfig()
 
 
 class Image2PipeTest(TestCase):
+    def test_min_params(self):
+        q = Queue()
+        decoder = image2pipe.images_from_url(q, VIDEO_URL)
+        decoder.start()
+
+        for i in range(30):
+            fn, img = q.get()
+            cv2.imshow("frame %d" % i, img)
+            cv2.waitKey()
+            cv2.destroyAllWindows()
+
     def test_rgb24_from_url(self):
         q = Queue()
         decoder = image2pipe.images_from_url(q, VIDEO_URL, fps="30", scale=SCALE)
@@ -54,6 +65,7 @@ class Image2PipeTest(TestCase):
 
 
 if __name__ == '__main__':
+    Image2PipeTest().test_min_params()
     Image2PipeTest().test_vf()
     Image2PipeTest().test_rgb24_from_url()
     Image2PipeTest().test_stitch()

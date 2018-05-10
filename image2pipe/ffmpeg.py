@@ -32,7 +32,7 @@ def bgr24_from_stdin_subp(_fps, _scale):
     return ffmpeg_p
 
 
-def images_from_url_subp(_fps, _scale, _url, ss=None, image_format='bgr24', vf: list = []):
+def images_from_url_subp(_fps, _scale, _url, ss=None, image_format='bgr24', vf: list = None):
     """
     Usage:
     p = images_from_url_subp(fps, scale, url)
@@ -52,7 +52,11 @@ def images_from_url_subp(_fps, _scale, _url, ss=None, image_format='bgr24', vf: 
         cmd.append(ss)
     cmd += ["-i", _url, '-an', '-sn', "-f", "image2pipe", "-vcodec", "rawvideo", "-pix_fmt", image_format]
 
-    _vf = copy.copy(vf)
+    if vf:
+        _vf = copy.copy(vf)
+    else:
+        _vf = []
+
     if _fps:
         _vf.append("fps=%s" % _fps)
     if _scale:

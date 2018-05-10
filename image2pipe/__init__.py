@@ -123,12 +123,13 @@ def _emitt_image_output(_proc, _emitter, _scale):
         _emitter.onError(sys.exc_info()[1])
 
 
-def images_from_url(q, video_url, ss="00:00:00", fps=None, scale=(224, 224), pix_fmt="bgr24", vf: list = []):
+def images_from_url(q: Queue, video_url: str, ss: str = "00:00:00", fps: str = None, scale: tuple = (224, 224),
+                    pix_fmt: str = "bgr24", vf: list = None):
     """
 
     :param ss: start second in a format of time "00:00:00"
     :param pix_fmt: rawcodec image format bgr24 or rgb24
-    :type scale: tuple
+    :type scale: tuple (width, height)
     :type fps: str
     :type video_url: str
     :type ss: str
