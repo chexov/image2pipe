@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='image2pipe',
-    version='0.1.5',
+    version='0.1.6',
     author='Anton P. Linevich',
     author_email='anton@linevich.com',
     keywords="ffmpeg yuv image2pipe",

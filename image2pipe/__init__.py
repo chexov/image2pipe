@@ -154,6 +154,14 @@ def ffprobe(url):
     return ffp
 
 
+def first_video_stream(ffprobe_json: dict):
+    video_stream = list(filter(lambda s: "video" == s.get("codec_type"), ffprobe_json.get("streams")))
+    if video_stream:
+        return video_stream[0]
+    else:
+        return None
+
+
 class StitchVideoProcess(multiprocessing.Process):
     def __init__(self, frames_q: Queue, out_url: str, fps: str, scale: tuple, pix_fmt: str = "bgr24",
                  muxer: str = 'flv'):
