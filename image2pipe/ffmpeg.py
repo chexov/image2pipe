@@ -6,6 +6,7 @@ import multiprocessing
 import subprocess
 
 import numpy
+from numpy.ma import frombuffer
 
 FFMPEG_BIN = "ffmpeg"
 log = logging.getLogger(__name__)
@@ -66,7 +67,7 @@ def images_from_url_subp(_fps, _scale, _url, ss=None, image_format='bgr24', vf: 
         cmd.append(",".join(_vf))
     cmd.append("-")
     log.debug("popen %s" % " ".join(cmd))
-    return subprocess.Popen(cmd, stdout=subprocess.PIPE, bufsize=10 ** 8)
+    return subprocess.Popen(cmd, stdout=subprocess.PIPE, stdin=subprocess.DEVNULL, bufsize=10 ** 8)
 
 
 def enqueue_frames_from_output(_proc, _qout, scale):
@@ -83,7 +84,7 @@ def enqueue_frames_from_output(_proc, _qout, scale):
         bb = _proc.stdout.read(img_size)
         if len(bb) > 0:
             try:
-                ndarr = numpy.frombuffer(bb, dtype=numpy.uint8).reshape((scale[1], scale[0], 3))
+                ndarr = frombuffer(bb, dtype=numpy.uint8).reshape((scale[1], scale[0], 3))
                 fn = next(frame_counter)
                 _qout.put((fn, ndarr))
             except Exception as err:
