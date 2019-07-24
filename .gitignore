@@ -1,3 +1,4 @@
 *.pyc
 dist/
 build/
+image2pipe.egg-info/

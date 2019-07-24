@@ -50,6 +50,7 @@ class Image2PipeTest(TestCase):
     def test_stitch(self):
         fps = "30"
         out_url = "out.ts"
+        # out_url = "out.mov"
         scale = (1000, 552)
 
         bgr_q = Queue()
@@ -57,6 +58,7 @@ class Image2PipeTest(TestCase):
         decoder = image2pipe.images_from_url(bgr_q, VIDEO_URL, fps="30", scale=(1000, 552))
         decoder.start()
 
+        # rtmpt = image2pipe.StitchVideoProcess(bgr_q, out_url, fps, scale, muxer="mov")
         FORMAT_MPEGTS = "mpegts"
         rtmpt = image2pipe.StitchVideoProcess(bgr_q, out_url, fps, scale, FORMAT_MPEGTS)
         rtmpt.start()

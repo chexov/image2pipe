@@ -22,7 +22,7 @@ import image2pipe
 logging.basicConfig()
 
 
-q = Queue()
+q = Queue(maxsize=4)
 decoder = image2pipe.images_from_url(q, "shuttle-flip.mp4", fps="30", scale=(1000, 556))
 decoder.start()
 
