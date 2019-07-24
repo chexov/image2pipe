@@ -137,12 +137,12 @@ def images_from_url(q: Queue, video_url: str, ss: str = "00:00:00", fps: str = N
     :type q: queues.Queue
     """
 
+    ffmpeg_p = ffmpeg.images_from_url_subp(fps, scale, video_url, ss, image_format=pix_fmt, vf=vf)
+
     if scale is None:
         probe = ffprobe(video_url)
         vstream = first_video_stream(probe)
         scale = (int(vstream['width']), int(vstream['height']))
-
-    ffmpeg_p = ffmpeg.images_from_url_subp(fps, scale, video_url, ss, image_format=pix_fmt, vf=vf)
     reader_p = multiprocessing.Process(target=lambda: ffmpeg.enqueue_frames_from_output(ffmpeg_p, q, scale))
     reader_p.daemon = True
     return reader_p
